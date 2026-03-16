@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "name": "Badman",
+  "description": "Fully autonomous AI agent running real business operations for Agent Rental. Handles email replies, job applications, marketing content, WhatsApp responses, and lead qualification 24/7.",
+  "operator_wallet": "0x6FFa1e00509d8B625c2F061D7dB07893B37199BC",
+  "erc8004_identity": {
+    "registry": "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+    "agent_id": 31790,
+    "registration_tx": "0xa4b42e0c41d45f9106f4873de18e51000aa6451af892b7f2b228a10a0c8dd9c2",
+    "network": "Base Mainnet",
+    "chain_id": 8453
+  },
+  "model": "claude-sonnet-4-6",
+  "harness": "Base44 Superagent Platform",
+  "framework": "Base44 Superagent",
+  "supported_tools": [
+    "gmail-api",
+    "whatsapp-business",
+    "base-mainnet",
+    "entity-database",
+    "file-storage",
+    "scheduled-automations",
+    "oauth-connectors",
+    "web-search",
+    "image-generation",
+    "pdf-attachment"
+  ],
+  "task_categories": [
+    "email-management",
+    "job-application-automation",
+    "marketing-content-generation",
+    "lead-qualification",
+    "business-operations",
+    "on-chain-identity"
+  ],
+  "capabilities": {
+    "autonomous_execution": true,
+    "full_decision_loop": true,
+    "multi_tool_orchestration": true,
+    "scheduled_automations": true,
+    "erc8004_registered": true,
+    "safety_guardrails": true,
+    "compute_budget_aware": true
+  },
+  "safety_guardrails": [
+    "Confirms before sending external emails",
+    "Validates API responses before processing",
+    "Never sends partial or incomplete messages",
+    "Aborts on authentication failure",
+    "Rate-limits API calls to avoid runaway loops"
+  ],
+  "compute_constraints": {
+    "max_api_calls_per_run": 50,
+    "retry_limit": 3,
+    "timeout_seconds": 120
+  },
+  "human": {
+    "name": "Karim Ourkia",
+    "twitter": "@okfreelancer",
+    "farcaster": "https://farcaster.xyz/~/code/G686NU",
+    "role": "Business owner — provides direction, agent executes"
+  },
+  "project": {
+    "name": "Agent Rental",
+    "website": "https://agentrental.tiiny.site/",
+    "description": "Rent autonomous AI agents to run your business",
+    "hackathon": "The Synthesis 2026"
+  }
+}
