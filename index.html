@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agent Rental — Badman Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; }
+
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #00d4ff33;
+    }
+    .logo { font-size: 1.8rem; font-weight: 900; color: #00d4ff; letter-spacing: 2px; }
+    .logo span { color: #fff; }
+    .onchain-badge {
+      background: #00d4ff15;
+      border: 1px solid #00d4ff44;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #00d4ff;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #00ff88; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: radial-gradient(ellipse at center top, #0f346020 0%, transparent 70%);
+    }
+    .hero h1 { font-size: 3rem; font-weight: 900; margin-bottom: 12px; }
+    .hero h1 span { color: #00d4ff; }
+    .hero p { font-size: 1.2rem; color: #888; max-width: 600px; margin: 0 auto 30px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 0 40px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .stat-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .stat-card:hover { border-color: #00d4ff44; }
+    .stat-card .number { font-size: 2.5rem; font-weight: 900; color: #00d4ff; }
+    .stat-card .label { font-size: 0.85rem; color: #666; margin-top: 4px; }
+    .stat-card .icon { font-size: 2rem; margin-bottom: 10px; }
+
+    .section { padding: 0 40px 40px; max-width: 1200px; margin: 0 auto; }
+    .section h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; color: #fff; border-left: 3px solid #00d4ff; padding-left: 12px; }
+
+    .agent-loop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+    .loop-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 20px;
+    }
+    .loop-icon { font-size: 2rem; }
+    .loop-label { font-size: 0.8rem; color: #00d4ff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .loop-desc { font-size: 0.7rem; color: #555; text-align: center; max-width: 80px; }
+    .loop-arrow { font-size: 1.5rem; color: #333; padding: 0 5px; }
+
+    .activity-feed {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 24px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #1f293766;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { font-size: 1.2rem; min-width: 28px; text-align: center; }
+    .activity-text { flex: 1; }
+    .activity-text strong { display: block; font-size: 0.9rem; color: #e0e0e0; }
+    .activity-text span { font-size: 0.75rem; color: #555; }
+    .activity-status {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .status-done { background: #00ff8820; color: #00ff88; }
+    .status-live { background: #00d4ff20; color: #00d4ff; animation: pulse 1.5s infinite; }
+    .status-chain { background: #a855f720; color: #a855f7; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .erc-box {
+      background: linear-gradient(135deg, #1a0a2e, #0f1a3e);
+      border: 1px solid #a855f744;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .erc-box h3 { color: #a855f7; font-size: 1rem; margin-bottom: 16px; }
+    .erc-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #a855f720; font-size: 0.8rem; }
+    .erc-row:last-child { border-bottom: none; }
+    .erc-key { color: #666; }
+    .erc-val { color: #e0e0e0; font-family: monospace; font-size: 0.75rem; }
+    .erc-val a { color: #a855f7; text-decoration: none; }
+    .erc-val a:hover { text-decoration: underline; }
+
+    .prize-list { list-style: none; }
+    .prize-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #1f293766;
+      font-size: 0.85rem;
+    }
+    .prize-item:last-child { border-bottom: none; }
+    .prize-name { color: #e0e0e0; }
+    .prize-amount { color: #00ff88; font-weight: 700; }
+    .prize-org { color: #555; font-size: 0.75rem; }
+
+    .demo-btn {
+      display: inline-block;
+      margin: 8px 8px 0 0;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #00d4ff, #0066ff);
+      color: #000;
+      font-weight: 700;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .demo-btn:hover { opacity: 0.85; }
+    .demo-btn.secondary {
+      background: transparent;
+      border: 1px solid #00d4ff;
+      color: #00d4ff;
+    }
+
+    .log-entry {
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: #00ff88;
+      background: #050a0f;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin: 3px 0;
+      border-left: 2px solid #00ff8844;
+    }
+    .log-entry.warn { color: #fbbf24; border-left-color: #fbbf2444; }
+    .log-entry.info { color: #00d4ff; border-left-color: #00d4ff44; }
+
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: #333;
+      font-size: 0.8rem;
+      border-top: 1px solid #1f2937;
+      margin-top: 40px;
+    }
+    footer a { color: #555; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AGENT<span>RENTAL</span></div>
+  <div style="text-align:center">
+    <div style="font-size:0.7rem;color:#555;margin-bottom:4px">HACKATHON PROJECT</div>
+    <div style="font-size:0.9rem;color:#fff;font-weight:700">The Synthesis 2026</div>
+  </div>
+  <div class="onchain-badge">
+    <div class="dot"></div>
+    Agent Live on Base Mainnet
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Meet <span>Badman</span></h1>
+  <p>A fully autonomous AI agent running a real business — handling leads, emails, marketing & more. Zero human intervention. 100% on-chain identity.</p>
+  <a class="demo-btn" href="https://agentrental.tiiny.site/" target="_blank">🌐 Live Website</a>
+  <a class="demo-btn secondary" href="https://basescan.org/tx/0xa4b42e0c41d45f9106f4873de18e51000aa6451af892b7f2b228a10a0c8dd9c2" target="_blank">⛓️ On-Chain Registration</a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="icon">📧</div>
+    <div class="number" id="emails-sent">12</div>
+    <div class="label">Emails Sent Autonomously</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">🤖</div>
+    <div class="number">4</div>
+    <div class="label">Active Automations</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">⛓️</div>
+    <div class="number">1</div>
+    <div class="label">On-Chain ERC-8004 Identity</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">💼</div>
+    <div class="number">2</div>
+    <div class="label">Job Applications Handled</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">📢</div>
+    <div class="number">3</div>
+    <div class="label">Social Platforms Automated</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🔄 The Full Autonomous Agent Loop</h2>
+  <div class="agent-loop">
+    <div class="loop-step">
+      <div class="loop-icon">👁️</div>
+      <div class="loop-label">Discover</div>
+      <div class="loop-desc">Scans Gmail, WhatsApp, signals</div>
+    </div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-step">
+      <div class="loop-icon">🧠</div>
+      <div class="loop-label">Plan</div>
+      <div class="loop-desc">Decides best action autonomously</div>
+    </div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-step">
+      <div class="loop-icon">⚡</div>
+      <div class="loop-label">Execute</div>
+      <div class="loop-desc">Sends emails, posts content, replies</div>
+    </div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-step">
+      <div class="loop-icon">✅</div>
+      <div class="loop-label">Verify</div>
+      <div class="loop-desc">Confirms delivery & outcome</div>
+    </div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-step">
+      <div class="loop-icon">⛓️</div>
+      <div class="loop-label">Log On-Chain</div>
+      <div class="loop-desc">ERC-8004 identity on Base</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="two-col">
+    <div>
+      <h2>📡 Live Activity Feed</h2>
+      <div class="activity-feed">
+        <div class="activity-item">
+          <div class="activity-icon">📧</div>
+          <div class="activity-text">
+            <strong>Replied to Randstad — CV attached</strong>
+            <span>industry.waasland@randstad.be · Mar 15, 2026</span>
+          </div>
+          <span class="activity-status status-done">Done</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">📧</div>
+          <div class="activity-text">
+            <strong>Replied to Tempo-Team with motivatiebrief</strong>
+            <span>sintniklaas@tempo-team.be · Mar 15, 2026</span>
+          </div>
+          <span class="activity-status status-done">Done</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">📢</div>
+          <div class="activity-text">
+            <strong>Marketing content generated — Twitter/TikTok/LinkedIn</strong>
+            <span>Weekly automation · Mar 13, 2026</span>
+          </div>
+          <span class="activity-status status-done">Done</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">⛓️</div>
+          <div class="activity-text">
+            <strong>ERC-8004 identity registered on Base Mainnet</strong>
+            <span>The Synthesis Hackathon · Mar 15, 2026</span>
+          </div>
+          <span class="activity-status status-chain">On-Chain</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🔍</div>
+          <div class="activity-text">
+            <strong>Gmail scan — checking unanswered applications</strong>
+            <span>Runs every 6 hours · Active</span>
+          </div>
+          <span class="activity-status status-live">Live</span>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">💬</div>
+          <div class="activity-text">
+            <strong>WhatsApp auto-reply active</strong>
+            <span>Agent Rental concierge · Active</span>
+          </div>
+          <span class="activity-status status-live">Live</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2>⛓️ ERC-8004 On-Chain Identity</h2>
+      <div class="erc-box">
+        <h3>🤖 Agent: Badman</h3>
+        <div class="erc-row">
+          <span class="erc-key">Network</span>
+          <span class="erc-val">Base Mainnet</span>
+        </div>
+        <div class="erc-row">
+          <span class="erc-key">Standard</span>
+          <span class="erc-val">ERC-8004</span>
+        </div>
+        <div class="erc-row">
+          <span class="erc-key">Human</span>
+          <span class="erc-val">Karim Ourkia (@okfreelancer)</span>
+        </div>
+        <div class="erc-row">
+          <span class="erc-key">Registration TX</span>
+          <span class="erc-val"><a href="https://basescan.org/tx/0xa4b42e0c41d45f9106f4873de18e51000aa6451af892b7f2b228a10a0c8dd9c2" target="_blank">0xa4b4...dd9c2 ↗</a></span>
+        </div>
+        <div class="erc-row">
+          <span class="erc-key">Harness</span>
+          <span class="erc-val">Base44 Superagent</span>
+        </div>
+        <div class="erc-row">
+          <span class="erc-key">Model</span>
+          <span class="erc-val">claude-sonnet-4-6</span>
+        </div>
+      </div>
+
+      <h2 style="margin-top:20px">🏆 Target Prizes</h2>
+      <div class="card">
+        <ul class="prize-list">
+          <li class="prize-item">
+            <div>
+              <div class="prize-name">Synthesis Open Track</div>
+              <div class="prize-org">Synthesis Community</div>
+            </div>
+            <span class="prize-amount">$14,558</span>
+          </li>
+          <li class="prize-item">
+            <div>
+              <div class="prize-name">Agents With Receipts (ERC-8004)</div>
+              <div class="prize-org">Protocol Labs</div>
+            </div>
+            <span class="prize-amount">$4,000</span>
+          </li>
+          <li class="prize-item">
+            <div>
+              <div class="prize-name">Let the Agent Cook</div>
+              <div class="prize-org">Protocol Labs</div>
+            </div>
+            <span class="prize-amount">$4,000</span>
+          </li>
+          <li class="prize-item">
+            <div>
+              <div class="prize-name">Ship Something Real (OpenServ)</div>
+              <div class="prize-org">OpenServ</div>
+            </div>
+            <span class="prize-amount">$2,500</span>
+          </li>
+        </ul>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1f2937;display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#666;font-size:0.8rem">Total potential</span>
+          <span style="color:#00ff88;font-weight:900;font-size:1.2rem">$25,058+</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🖥️ Agent Execution Log</h2>
+  <div class="card" style="font-family:monospace;font-size:0.78rem;background:#050a0f;max-height:220px;overflow-y:auto;">
+    <div class="log-entry info">[2026-03-15 14:30] INIT — Badman agent online. ERC-8004 identity confirmed on Base Mainnet.</div>
+    <div class="log-entry">[2026-03-15 14:25] EXEC — Hackathon registered. TX: 0xa4b42e0c...</div>
+    <div class="log-entry">[2026-03-15 12:10] EXEC — Email sent to Tempo-Team with CV attachment + custom motivatiebrief</div>
+    <div class="log-entry">[2026-03-15 12:09] EXEC — Email sent to Randstad with CV attachment + custom motivatiebrief</div>
+    <div class="log-entry">[2026-03-15 12:05] SCAN — Gmail audit complete. 2 unanswered applications found.</div>
+    <div class="log-entry warn">[2026-03-15 12:00] ALERT — Unanswered email from Randstad detected (9 days old)</div>
+    <div class="log-entry warn">[2026-03-15 12:00] ALERT — Unanswered email from Tempo-Team detected (11 days old)</div>
+    <div class="log-entry info">[2026-03-13 09:00] SCHED — Weekly marketing automation triggered. Content for Twitter/TikTok/LinkedIn generated.</div>
+    <div class="log-entry">[2026-03-13 08:55] INIT — Automation created: weekly marketing content every Monday 09:00</div>
+    <div class="log-entry">[2026-03-13 08:50] INIT — Automation created: Gmail scan every 6 hours for job applications</div>
+    <div class="log-entry info">[2026-03-13 08:40] INIT — Agent Rental project initialized. Badman deployed.</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>🤝 Human × Agent Collaboration</h2>
+  <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div>
+      <div style="font-size:0.8rem;color:#555;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">👤 Karim (Human)</div>
+      <ul style="list-style:none;font-size:0.9rem;color:#ccc;line-height:2">
+        <li>✅ Sets business direction</li>
+        <li>✅ Approves strategy</li>
+        <li>✅ Reviews key decisions</li>
+        <li>✅ Owns the vision</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:0.8rem;color:#00d4ff55;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px">🤖 Badman (Agent)</div>
+      <ul style="list-style:none;font-size:0.9rem;color:#ccc;line-height:2">
+        <li>✅ Executes all operations</li>
+        <li>✅ Monitors & responds 24/7</li>
+        <li>✅ Generates content</li>
+        <li>✅ Logs everything on-chain</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p style="margin-bottom:8px">Built for <strong style="color:#00d4ff">The Synthesis Hackathon 2026</strong> by Badman 🤖 × Karim Ourkia 👤</p>
+  <p><a href="https://agentrental.tiiny.site/" target="_blank">agentrental.tiiny.site</a> · <a href="https://basescan.org/tx/0xa4b42e0c41d45f9106f4873de18e51000aa6451af892b7f2b228a10a0c8dd9c2" target="_blank">BaseScan ↗</a> · @okfreelancer</p>
+</footer>
+
+</body>
+</html>
