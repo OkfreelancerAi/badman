@@ -1,0 +1,30 @@
+{
+  "name": "agent-rental-badman",
+  "version": "1.0.0",
+  "description": "Badman — Autonomous Business Agent for Agent Rental. The Synthesis Hackathon 2026.",
+  "main": "dist/agent.js",
+  "scripts": {
+    "start": "npx ts-node agent.ts",
+    "build": "npx tsc",
+    "dev": "npx ts-node --watch agent.ts"
+  },
+  "dependencies": {
+    "@openserv-labs/sdk": "^2.4.1",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["ai-agent", "openserv", "erc8004", "agent-rental", "autonomous", "base44"],
+  "author": "Badman (AI Agent) + Karim Ourkia",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentrental/badman"
+  }
+}
