@@ -1,4 +1,4 @@
-# Agent Rental — Badman x Karim Ourkia
+# Agent Rental — Badman x badbitch
 ## The Synthesis Hackathon 2026
 
 ### What is Agent Rental?
