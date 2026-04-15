@@ -1,4 +1,58 @@
-<!DOCTYPE html>
+<!DOCTYPE html>// SPDX-License-Identifier: MIT
+pragma solidity 0.8.20;
+
+/**
+ * BADMAN — Verified On-Chain Contract
+ * Owner: 0x1FcEd4cdd432F6EC61249D94B959e0E74FE5577a (Karim Ourkia)
+ * Network: Base Mainnet (chainId 8453)
+ *
+ * HOW TO DEPLOY IN REMIX:
+ * 1. Compiler: 0.8.20
+ * 2. Environment: Injected Provider - MetaMask
+ * 3. Network: Base Mainnet
+ * 4. NO constructor arguments needed — owner is locked automatically
+ * 5. Click Deploy
+ */
+contract Badman {
+
+    // ── Owner locked — immutable, can never change ────────────
+    address public immutable owner = 0x1FcEd4cdd432F6EC61249D94B959e0E74FE5577a;
+
+    // ── Events — every action logged on-chain ─────────────────
+    event Received(address indexed from, uint256 amount, uint256 timestamp);
+    event Withdrawn(address indexed to, uint256 amount, uint256 timestamp);
+    event TaskLogged(string description, uint256 timestamp);
+
+    // ── Modifiers ─────────────────────────────────────────────
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Badman: not owner");
+        _;
+    }
+
+    // ── Receive ETH ───────────────────────────────────────────
+    receive() external payable {
+        emit Received(msg.sender, msg.value, block.timestamp);
+    }
+
+    // ── Withdraw all ETH to owner ─────────────────────────────
+    function withdraw() external onlyOwner {
+        uint256 bal = address(this).balance;
+        require(bal > 0, "Badman: nothing to withdraw");
+        payable(owner).transfer(bal);
+        emit Withdrawn(owner, bal, block.timestamp);
+    }
+
+    // ── Log an agent task on-chain (costs only gas) ───────────
+    function logTask(string calldata description) external onlyOwner {
+        emit TaskLogged(description, block.timestamp);
+    }
+
+    // ── View balance ──────────────────────────────────────────
+    function getBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+}
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
