@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for badman-jjtitq on 2026-04-09T06:34:43Z
+# fly.toml app configuration file generated for badman-1dlyog on 2026-05-07T07:00:56Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'badman-jjtitq'
+app = 'badman-1dlyog'
 primary_region = 'ams'
 
 [build]
@@ -21,3 +21,4 @@ primary_region = 'ams'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+  memory_mb = 256
