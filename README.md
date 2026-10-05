@@ -1,41 +1,107 @@
-# Agent Rental — Badman x badbitch
-## The Synthesis Hackathon 2026
+# Badman
 
-### What is Agent Rental?
-Agent Rental is a managed AI agent service for entrepreneurs. Instead of hiring staff for repetitive business operations, you rent a fully autonomous AI agent (Badman) that handles:
-- 📧 Lead intake & qualification
-- 💬 Auto-replies to prospects
-- 📅 Meeting scheduling
-- 📊 Follow-up sequences
-- 📣 Marketing content generation
+**Autonomous business agent for Agent Rental.**
 
-### How it works
-1. A prospect contacts Agent Rental
-2. Badman autonomously handles the conversation
-3. Every action is logged on-chain via ERC-8004
-4. The human (Karim) stays in control — just reviews the dashboard
+Built at The Synthesis Hackathon 2026 with OpenServ + ERC-8004 on Base Mainnet.
 
-### ERC-8004 Integration
-Badman is registered on Base Mainnet as an ERC-8004 agent:
-- participantId: 8c34aafa47154a4f83cc4463ce110bc4
-- Registration TX: https://basescan.org/tx/0xa4b42e0c41d45f9106f4873de18e51000aa6451af892b7f2b228a10a0c8dd9c2
+Live dashboard: [badman.fly.dev](https://badman.fly.dev)
 
-### The Full Agent Loop
+---
+
+## What Badman does
+
+Instead of hiring staff for repetitive operations, you rent a fully autonomous agent that handles:
+
+- Lead intake & qualification
+- Auto-replies to prospects
+- Meeting scheduling
+- Follow-up sequences
+- Marketing content generation (Twitter / TikTok / LinkedIn)
+- Job application drafting & sending
+
+Every meaningful action is logged on-chain.
+
+---
+
+## How it works
+
+```
 discover → plan → execute → verify → log on-chain
+```
 
-### Live Demo
-The agent is live and operational — it currently:
-- Monitors Gmail every 6 hours for job application replies
-- Sends weekly marketing content to Twitter/TikTok/LinkedIn
-- Handles WhatsApp auto-responses
-- Logs all actions with timestamps
+1. Prospect or system event arrives
+2. Badman decides and acts autonomously
+3. Action is verified
+4. Result is recorded via ERC-8004 on Base
 
-### Tech Stack
-- Base44 Superagent Platform
-- Claude claude-sonnet-4-6
-- Gmail API (OAuth)
-- Base Mainnet (ERC-8004)
-- WhatsApp Business
+The human sets direction. The agent executes.
 
-### Human-Agent Collaboration
-Karim provides the business direction. Badman executes. This is what true human-agent collaboration looks like — not a chatbot, a business partner.
+---
+
+## On-chain identity (Base Mainnet)
+
+| Field | Value |
+|-------|-------|
+| Network | Base (chainId 8453) |
+| Agent ID | 31790 |
+| Operator wallet | `0x6FFa1e00509d8B625c2F061D7dB07893B37199BC` |
+| Registration TX | [0xa4b42e…](https://basescan.org/tx/0xa4b42e0c41d45f9106f4873de18e51000aa6451af892b7f2b228a10a0c8dd9c2) |
+
+---
+
+## Currently running
+
+- Gmail scan every 6 hours for recruiter / lead replies
+- Weekly marketing content generation (Mon 09:00)
+- WhatsApp auto-responses
+- Full action log with timestamps (`agent_log.json`)
+
+---
+
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Model | Claude Sonnet 4 |
+| Harness | Base44 Superagent + OpenServ |
+| Chain | Base Mainnet (ERC-8004) |
+| Integrations | Gmail API, WhatsApp Business, scheduled automations |
+| Hosting | Fly.io |
+
+---
+
+## OpenServ capabilities
+
+Badman is registered as a callable service with:
+
+- `qualify_lead`
+- `generate_marketing_content`
+- `draft_job_application`
+- `get_agent_rental_info`
+
+Other agents in the ecosystem can call these directly.
+
+---
+
+## Project files
+
+| File | Purpose |
+|------|---------|
+| `agent.json` | Full agent identity + capabilities + safety rules |
+| `agent_log.json` | Running action log |
+| `BUILD_STORY.md` | Full build narrative from the hackathon |
+| `index.html` | Live dashboard |
+| `openserv/` | OpenServ integration |
+
+---
+
+## Human + Agent
+
+**Karim Ourkia** sets business direction.  
+**Badman** executes the loop.
+
+Not a chatbot. A business partner with an on-chain identity.
+
+---
+
+Built by Badman 🤖 + Karim Ourkia 👤 — The Synthesis 2026
